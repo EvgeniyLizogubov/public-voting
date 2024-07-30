@@ -1,0 +1,20 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="init-users" author="Lizogubov Eugeny">
+        <sql>
+            CREATE TABLE users
+            (
+                id        SERIAL PRIMARY KEY,
+                firstName VARCHAR(20)  NOT NULL,
+                lastName  VARCHAR(30)  NOT NULL,
+                email     VARCHAR(128) NOT NULL UNIQUE,
+                password  VARCHAR(32)  NOT NULL,
+                points    INT DEFAULT 0
+            );
+        </sql>
+    </changeSet>
+</databaseChangeLog>
