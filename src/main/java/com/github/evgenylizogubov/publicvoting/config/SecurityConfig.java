@@ -1,8 +1,6 @@
 package com.github.evgenylizogubov.publicvoting.config;
 
-import com.github.evgenylizogubov.publicvoting.mapper.UserMapper;
 import com.github.evgenylizogubov.publicvoting.model.Role;
-import com.github.evgenylizogubov.publicvoting.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
