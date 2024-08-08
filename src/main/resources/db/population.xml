@@ -1,0 +1,32 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="populate-users" author="Lizogubov Eugeny">
+        <preConditions>
+            <tableExists tableName="users"/>
+        </preConditions>
+        <sql>
+            INSERT INTO users(first_name, last_name, email, password)
+            VALUES ('User', 'Userov', 'user@mail.ru', '$2a$10$SZLkhN4nHTVe.25IL1iMEOtb8L6E7YEB2MkDwVHm2V/auVK/SfhRC'),
+                   ('Admin', 'Adminov', 'admin@gmail.com', '$2a$10$/VzDUIIZfUtr/mvRJY0t8eAfre4cw68cwKblSz3xMh5EqAVf60HCe');
+        </sql>
+    </changeSet>
+
+    <changeSet id="populate-user_role" author="Lizogubov Eugeny">
+        <preConditions>
+            <and>
+                <tableExists tableName="users"/>
+                <tableExists tableName="user_role"/>
+            </and>
+        </preConditions>
+        <sql>
+            INSERT INTO user_role(user_id, role)
+            VALUES (1, 'USER'),
+                   (2, 'ADMIN'),
+                   (2, 'USER');
+        </sql>
+    </changeSet>
+</databaseChangeLog>
