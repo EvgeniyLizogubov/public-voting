@@ -1,0 +1,73 @@
+package com.github.evgenylizogubov.publicvoting.service;
+
+import com.github.evgenylizogubov.publicvoting.dto.UserDto;
+import com.github.evgenylizogubov.publicvoting.error.IllegalRequestDataException;
+import com.github.evgenylizogubov.publicvoting.error.NotFoundException;
+import com.github.evgenylizogubov.publicvoting.mapper.UserMapper;
+import com.github.evgenylizogubov.publicvoting.model.User;
+import com.github.evgenylizogubov.publicvoting.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    
+    public UserDto get(int id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.map(userMapper::toDto).orElse(null);
+    }
+    
+    public UserDto getByEmail(String email) {
+        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
+        return user.map(userMapper::toDto).orElse(null);
+    }
+    
+    public List<UserDto> getAll() {
+        return userMapper.toDtoList(userRepository.findAll());
+    }
+    
+    @Transactional
+    public UserDto create(UserDto userDto) {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() + "\" already exists");
+        }
+        
+        User saved = userRepository.save(prepareToSave(userMapper.toEntity(userDto)));
+        return userMapper.toDto(saved);
+    }
+    
+    @Transactional
+    public UserDto update(UserDto userDto, int id) {
+        if (!userRepository.existsById(id)) {
+            throw new NotFoundException("User with id=" + id + " not found");
+        }
+        
+        Optional<User> checkedUser = userRepository.findByEmailIgnoreCase(userDto.getEmail());
+        if (checkedUser.isPresent() && checkedUser.get().getId() != id) {
+            throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() + "\" already exists");
+        }
+        
+        userDto.setId(id);
+        User updated = userRepository.save(prepareToSave(userMapper.toEntity(userDto)));
+        return userMapper.toDto(updated);
+    }
+    
+    public int delete(int id) {
+        return userRepository.removeById(id);
+    }
+    
+    private User prepareToSave(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setEmail(user.getEmail().toLowerCase());
+        return user;
+    }
+}

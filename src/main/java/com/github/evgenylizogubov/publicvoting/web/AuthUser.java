@@ -1,5 +1,6 @@
 package com.github.evgenylizogubov.publicvoting.web;
 
+import com.github.evgenylizogubov.publicvoting.dto.UserDto;
 import com.github.evgenylizogubov.publicvoting.model.Role;
 import com.github.evgenylizogubov.publicvoting.model.User;
 import jakarta.validation.constraints.NotNull;
@@ -11,15 +12,15 @@ import static java.util.Objects.requireNonNull;
 
 public class AuthUser extends org.springframework.security.core.userdetails.User {
     @Getter
-    private final User user;
+    private final UserDto userDto;
     
-    public AuthUser(@NotNull User user) {
-        super(user.getEmail(), user.getPassword(), user.getRoles());
-        this.user = user;
+    public AuthUser(@NotNull UserDto userDto) {
+        super(userDto.getEmail(), userDto.getPassword(), userDto.getRoles());
+        this.userDto = userDto;
     }
     
     public int id() {
-        return user.getId();
+        return userDto.getId();
     }
     
     public static AuthUser safeGet() {
@@ -34,8 +35,8 @@ public class AuthUser extends org.springframework.security.core.userdetails.User
         return requireNonNull(safeGet(), "No authorized user found");
     }
     
-    public static User authUser() {
-        return get().getUser();
+    public static UserDto authUser() {
+        return get().getUserDto();
     }
     
     public static int authId() {
@@ -43,11 +44,11 @@ public class AuthUser extends org.springframework.security.core.userdetails.User
     }
     
     public boolean hasRole(Role role) {
-        return user.hasRole(role);
+        return userDto.hasRole(role);
     }
     
     @Override
     public String toString() {
-        return "AuthUser:" + user.getId() + '[' + user.getEmail() + ']';
+        return "AuthUser:" + id() + '[' + userDto.getEmail() + ']';
     }
 }

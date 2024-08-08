@@ -8,12 +8,27 @@
         <sql>
             CREATE TABLE users
             (
-                id        SERIAL PRIMARY KEY,
-                firstName VARCHAR(20)  NOT NULL,
-                lastName  VARCHAR(30)  NOT NULL,
-                email     VARCHAR(128) NOT NULL UNIQUE,
-                password  VARCHAR(32)  NOT NULL,
-                points    INT DEFAULT 0
+                id         SERIAL PRIMARY KEY,
+                first_name VARCHAR(20)  NOT NULL,
+                last_name  VARCHAR(30)  NOT NULL,
+                email      VARCHAR(128) NOT NULL UNIQUE,
+                password   VARCHAR      NOT NULL,
+                points     INT DEFAULT 0
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="init-user-role" author="Lizogubov Eugeny">
+        <preConditions>
+            <tableExists tableName="users"/>
+        </preConditions>
+        <sql>
+            CREATE TABLE user_role
+            (
+                user_id INTEGER NOT NULL,
+                role    VARCHAR NOT NULL,
+                CONSTRAINT uk_user_role UNIQUE (user_id, role),
+                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
             );
         </sql>
     </changeSet>
