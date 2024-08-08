@@ -1,6 +1,6 @@
-package com.github.evgenylizogubov.publicvoting.dto;
+package com.github.evgenylizogubov.publicvoting.controller.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.evgenylizogubov.publicvoting.controller.dto.BaseDto;
 import com.github.evgenylizogubov.publicvoting.mapper.Default;
 import com.github.evgenylizogubov.publicvoting.model.Role;
 import lombok.Getter;
@@ -18,8 +18,6 @@ public class UserDto extends BaseDto {
     private String firstName;
     private String lastName;
     private String email;
-    
-    @JsonIgnore
     private String password;
     private Integer points;
     private Set<Role> roles;

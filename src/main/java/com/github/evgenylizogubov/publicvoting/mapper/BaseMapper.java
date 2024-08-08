@@ -1,6 +1,6 @@
 package com.github.evgenylizogubov.publicvoting.mapper;
 
-import com.github.evgenylizogubov.publicvoting.dto.BaseDto;
+import com.github.evgenylizogubov.publicvoting.controller.dto.BaseDto;
 import org.mapstruct.MappingTarget;
 
 import java.util.Collection;

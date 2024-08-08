@@ -1,5 +1,6 @@
-package com.github.evgenylizogubov.publicvoting.dto;
+package com.github.evgenylizogubov.publicvoting.controller.dto.user;
 
+import com.github.evgenylizogubov.publicvoting.controller.dto.BaseDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -8,7 +9,7 @@ import lombok.Value;
 
 @EqualsAndHashCode(callSuper = true)
 @Value
-public class UserRequestDto extends BaseDto {
+public class UserRequest extends BaseDto {
     @NotBlank
     @Size(min = 2, max = 20)
     private final String firstName;

@@ -1,12 +1,10 @@
-package com.github.evgenylizogubov.publicvoting.web.user;
+package com.github.evgenylizogubov.publicvoting.controller.user;
 
-import com.github.evgenylizogubov.publicvoting.dto.UserDto;
-import com.github.evgenylizogubov.publicvoting.dto.UserRequestDto;
-import com.github.evgenylizogubov.publicvoting.dto.UserResponseDto;
+import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
+import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
+import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserResponse;
 import com.github.evgenylizogubov.publicvoting.mapper.UserDtoMapper;
-import com.github.evgenylizogubov.publicvoting.mapper.UserMapper;
 import com.github.evgenylizogubov.publicvoting.mapper.UserResponseMapper;
-import com.github.evgenylizogubov.publicvoting.model.User;
 import com.github.evgenylizogubov.publicvoting.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,15 +60,16 @@ public class AdminUserController {
     }
     
     @GetMapping
-    public List<UserDto> getAll() {
+    public List<UserResponse> getAll() {
         log.info("getAll");
-        return userService.getAll();
+        List<UserDto> users = userService.getAll();
+        return userResponseMapper.toDtoList(users);
     }
     
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponseDto> createWithLocation(@Valid @RequestBody UserRequestDto userRequestDto) {
-        log.info("create {}", userRequestDto);
-        UserDto created = userService.create(userDtoMapper.toEntity(userRequestDto));
+    public ResponseEntity<UserResponse> createWithLocation(@Valid @RequestBody UserRequest userRequest) {
+        log.info("create {}", userRequest);
+        UserDto created = userService.create(userDtoMapper.toEntity(userRequest));
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
@@ -78,9 +77,9 @@ public class AdminUserController {
     }
     
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public UserResponseDto update(@Valid @RequestBody UserRequestDto userRequestDto, @PathVariable int id) {
-        log.info("update {} with id={}", userRequestDto, id);
-        UserDto updated = userService.update(userDtoMapper.toEntity(userRequestDto), id);
+    public UserResponse update(@Valid @RequestBody UserRequest userRequest, @PathVariable int id) {
+        log.info("update {} with id={}", userRequest, id);
+        UserDto updated = userService.update(userDtoMapper.toEntity(userRequest), id);
         return userResponseMapper.toDto(updated);
     }
     

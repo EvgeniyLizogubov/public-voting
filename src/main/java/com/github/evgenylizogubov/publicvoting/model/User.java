@@ -1,7 +1,6 @@
 package com.github.evgenylizogubov.publicvoting.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.evgenylizogubov.publicvoting.mapper.Default;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -20,12 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
-import org.hibernate.validator.constraints.UniqueElements;
-import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -67,25 +61,6 @@ public class User extends BaseEntity {
     @Column(name = "role")
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-    
-    @Default
-    public User(Integer id, String firstName, String lastName, String email, String password, int points, Role... roles) {
-        this(id, firstName, lastName, email, password, points, Arrays.asList(roles));
-    }
-
-    public User(Integer id, String firstName, String lastName, String email, String password, int points, Collection<Role> roles) {
-        super(id);
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.points = points;
-        setRoles(roles);
-    }
-
-    public void setRoles(Collection<Role> roles) {
-        this.roles = CollectionUtils.isEmpty(roles) ? EnumSet.noneOf(Role.class) : EnumSet.copyOf(roles);
-    }
     
     @Override
     public final boolean equals(Object o) {

@@ -1,6 +1,6 @@
 package com.github.evgenylizogubov.publicvoting.service;
 
-import com.github.evgenylizogubov.publicvoting.dto.UserDto;
+import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.error.IllegalRequestDataException;
 import com.github.evgenylizogubov.publicvoting.error.NotFoundException;
 import com.github.evgenylizogubov.publicvoting.mapper.UserMapper;
@@ -41,7 +41,9 @@ public class UserService {
             throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() + "\" already exists");
         }
         
-        User saved = userRepository.save(prepareToSave(userMapper.toEntity(userDto)));
+        User user = userMapper.toEntity(userDto);
+        prepareToSave(user);
+        User saved = userRepository.save(user);
         return userMapper.toDto(saved);
     }
     
@@ -57,7 +59,9 @@ public class UserService {
         }
         
         userDto.setId(id);
-        User updated = userRepository.save(prepareToSave(userMapper.toEntity(userDto)));
+        User user = userMapper.toEntity(userDto);
+        prepareToSave(user);
+        User updated = userRepository.save(user);
         return userMapper.toDto(updated);
     }
     
@@ -65,9 +69,8 @@ public class UserService {
         return userRepository.removeById(id);
     }
     
-    private User prepareToSave(User user) {
+    private void prepareToSave(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEmail(user.getEmail().toLowerCase());
-        return user;
     }
 }

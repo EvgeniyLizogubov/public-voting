@@ -1,12 +1,12 @@
-package com.github.evgenylizogubov.publicvoting.web.user;
+package com.github.evgenylizogubov.publicvoting.controller.user;
 
-import com.github.evgenylizogubov.publicvoting.dto.UserDto;
-import com.github.evgenylizogubov.publicvoting.dto.UserRequestDto;
+import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
+import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
+import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserResponse;
 import com.github.evgenylizogubov.publicvoting.mapper.UserDtoMapper;
 import com.github.evgenylizogubov.publicvoting.mapper.UserResponseMapper;
-import com.github.evgenylizogubov.publicvoting.model.User;
 import com.github.evgenylizogubov.publicvoting.service.UserService;
-import com.github.evgenylizogubov.publicvoting.web.AuthUser;
+import com.github.evgenylizogubov.publicvoting.controller.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -40,31 +40,32 @@ public class ProfileController {
     private final Logger log = getLogger(getClass());
     
     @GetMapping
-    public UserDto get(@AuthenticationPrincipal AuthUser authUser) {
+    public UserResponse get(@AuthenticationPrincipal AuthUser authUser) {
         log.info("get {}", authUser);
-        return authUser.getUserDto();
+        return userResponseMapper.toDto(authUser.getUserDto());
     }
     
     @DeleteMapping
     public void delete(@AuthenticationPrincipal AuthUser authUser) {
-        log.info("delete {}", authUser.id());
-        userService.delete(authUser.id());
+        log.info("delete {}", authUser.getUserDto().getId());
+        userService.delete(authUser.getUserDto().getId());
     }
     
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<UserDto> register(@Valid @RequestBody UserRequestDto userRequestDto) {
-        log.info("registered {}", userRequestDto);
-        UserDto created = userService.create(userDtoMapper.toEntity(userRequestDto));
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRequest userRequest) {
+        log.info("registered {}", userRequest);
+        UserDto created = userService.create(userDtoMapper.toEntity(userRequest));
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL).build().toUri();
-        return ResponseEntity.created(uriOfNewResource).body(created);
+                .path(REST_URL + "/" + created.getId()).build().toUri();
+        return ResponseEntity.created(uriOfNewResource).body(userResponseMapper.toDto(created));
     }
     
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public UserDto update(@RequestBody @Valid UserRequestDto userRequestDto, @AuthenticationPrincipal AuthUser authUser) {
-        log.info("update {} with id={}", userRequestDto, authUser.id());
+    public UserResponse update(@RequestBody @Valid UserRequest userRequest, @AuthenticationPrincipal AuthUser authUser) {
+        log.info("update {} with id={}", userRequest, authUser.getUserDto().getId());
         UserDto userDto = authUser.getUserDto();
-        return userService.update(userDtoMapper.updateFromDto(userDto, userRequestDto), authUser.id());
+        UserDto updated = userService.update(userDtoMapper.updateFromDto(userDto, userRequest), userDto.getId());
+        return userResponseMapper.toDto(updated);
     }
 }

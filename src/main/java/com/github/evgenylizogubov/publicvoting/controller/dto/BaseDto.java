@@ -1,4 +1,4 @@
-package com.github.evgenylizogubov.publicvoting.dto;
+package com.github.evgenylizogubov.publicvoting.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
