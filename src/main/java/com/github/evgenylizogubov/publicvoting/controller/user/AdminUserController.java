@@ -3,8 +3,8 @@ package com.github.evgenylizogubov.publicvoting.controller.user;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserResponse;
-import com.github.evgenylizogubov.publicvoting.mapper.UserDtoMapper;
-import com.github.evgenylizogubov.publicvoting.mapper.UserResponseMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.UserRequestToUserDtoMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.UserUserDtoToResponseMapper;
 import com.github.evgenylizogubov.publicvoting.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +34,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class AdminUserController {
     static final String REST_URL = "/api/admin/users";
     
-    private final UserDtoMapper userDtoMapper;
-    private final UserResponseMapper userResponseMapper;
+    private final UserRequestToUserDtoMapper userRequestToUserDtoMapper;
+    private final UserUserDtoToResponseMapper userUserDtoToResponseMapper;
     private final UserService userService;
     private final Logger log = getLogger(getClass());
     
@@ -46,7 +46,7 @@ public class AdminUserController {
         if (userDto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id=" + id + " not found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseMapper.toDto(userDto));
+        return ResponseEntity.status(HttpStatus.OK).body(userUserDtoToResponseMapper.toDto(userDto));
     }
     
     @GetMapping("/by-email")
@@ -56,31 +56,31 @@ public class AdminUserController {
         if (userDto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with email \"" + email + "\" not found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseMapper.toDto(userDto));
+        return ResponseEntity.status(HttpStatus.OK).body(userUserDtoToResponseMapper.toDto(userDto));
     }
     
     @GetMapping
     public List<UserResponse> getAll() {
         log.info("getAll");
         List<UserDto> users = userService.getAll();
-        return userResponseMapper.toDtoList(users);
+        return userUserDtoToResponseMapper.toDtoList(users);
     }
     
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> createWithLocation(@Valid @RequestBody UserRequest userRequest) {
         log.info("create {}", userRequest);
-        UserDto created = userService.create(userDtoMapper.toEntity(userRequest));
+        UserDto created = userService.create(userRequestToUserDtoMapper.toEntity(userRequest));
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
-        return ResponseEntity.created(uriOfNewResource).body(userResponseMapper.toDto(created));
+        return ResponseEntity.created(uriOfNewResource).body(userUserDtoToResponseMapper.toDto(created));
     }
     
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse update(@Valid @RequestBody UserRequest userRequest, @PathVariable int id) {
         log.info("update {} with id={}", userRequest, id);
-        UserDto updated = userService.update(userDtoMapper.toEntity(userRequest), id);
-        return userResponseMapper.toDto(updated);
+        UserDto updated = userService.update(userRequestToUserDtoMapper.toEntity(userRequest), id);
+        return userUserDtoToResponseMapper.toDto(updated);
     }
     
     @DeleteMapping("/{id}")
