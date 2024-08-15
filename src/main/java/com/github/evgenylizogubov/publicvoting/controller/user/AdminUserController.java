@@ -8,7 +8,7 @@ import com.github.evgenylizogubov.publicvoting.mapper.UserUserDtoToResponseMappe
 import com.github.evgenylizogubov.publicvoting.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,18 +26,16 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 @RestController
 @RequestMapping(value = AdminUserController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@Slf4j
 public class AdminUserController {
     static final String REST_URL = "/api/admin/users";
     
     private final UserRequestToUserDtoMapper userRequestToUserDtoMapper;
     private final UserUserDtoToResponseMapper userUserDtoToResponseMapper;
     private final UserService userService;
-    private final Logger log = getLogger(getClass());
     
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable int id) {
