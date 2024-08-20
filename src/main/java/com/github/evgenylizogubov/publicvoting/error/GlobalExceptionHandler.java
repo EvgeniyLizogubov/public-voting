@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalRequestDataException.class)
     public ResponseEntity<String> handleIllegalRequestDataException(IllegalRequestDataException ex) {
-        log.error(ex.getMessage(), ex); // Уточнить про выбрасывание исключений в контроллере для их логирования
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
     
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handlerNotFoundException(NotFoundException ex) {
-        log.error(ex.getMessage(), ex); // Уточнить про выбрасывание исключений в контроллере для их логирования
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

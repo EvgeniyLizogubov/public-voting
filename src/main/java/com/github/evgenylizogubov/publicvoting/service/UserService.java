@@ -38,7 +38,8 @@ public class UserService {
     @Transactional
     public UserDto create(UserDto userDto) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() + "\" already exists");
+            throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() +
+                    "\" already exists");
         }
         
         User user = userToUserDtoMapper.toEntity(userDto);
@@ -55,7 +56,8 @@ public class UserService {
         
         Optional<User> checkedUser = userRepository.findByEmailIgnoreCase(userDto.getEmail());
         if (checkedUser.isPresent() && checkedUser.get().getId() != id) {
-            throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() + "\" already exists");
+            throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() +
+                    "\" already exists");
         }
         
         userDto.setId(id);
