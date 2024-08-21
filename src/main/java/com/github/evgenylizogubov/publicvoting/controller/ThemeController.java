@@ -66,7 +66,7 @@ public class ThemeController {
     public ResponseEntity<?> delete(@PathVariable int id) {
         log.info("delete {}", id);
         if (themeService.delete(id) == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity with id=" + id + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Theme with id=" + id + " not found");
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

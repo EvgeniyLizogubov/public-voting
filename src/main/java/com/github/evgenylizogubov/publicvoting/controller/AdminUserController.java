@@ -87,7 +87,7 @@ public class AdminUserController {
     public ResponseEntity<?> delete(@PathVariable int id) {
         log.info("delete {}", id);
         if (userService.delete(id) == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity with id=" + id + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id=" + id + " not found");
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
