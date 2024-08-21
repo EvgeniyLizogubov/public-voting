@@ -1,4 +1,4 @@
-package com.github.evgenylizogubov.publicvoting.controller.user;
+package com.github.evgenylizogubov.publicvoting.controller;
 
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
@@ -6,7 +6,6 @@ import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserResponse;
 import com.github.evgenylizogubov.publicvoting.mapper.UserDtoMapper;
 import com.github.evgenylizogubov.publicvoting.mapper.UserResponseMapper;
 import com.github.evgenylizogubov.publicvoting.service.UserService;
-import com.github.evgenylizogubov.publicvoting.controller.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

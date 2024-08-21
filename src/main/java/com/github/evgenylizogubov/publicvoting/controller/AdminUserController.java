@@ -1,4 +1,4 @@
-package com.github.evgenylizogubov.publicvoting.controller.user;
+package com.github.evgenylizogubov.publicvoting.controller;
 
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
