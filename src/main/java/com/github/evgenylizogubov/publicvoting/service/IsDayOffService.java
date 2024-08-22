@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -17,7 +18,7 @@ public class IsDayOffService {
     private final WebClient webClient;
     private final MessageSource messageSource;
     
-    public boolean checkWorkingDay(LocalDate date) {
+    public IsDayOffServiceResponse getDateInfo(LocalDate date) {
         log.info("Check date=\"{}\" for weekend or holiday", date);
         String response = webClient.get()
                 .uri("/" + date)
@@ -35,11 +36,16 @@ public class IsDayOffService {
                 Integer.toString(code), null, LocaleContextHolder.getLocale()
         );
         
-        if (code > 1) {
+        if (!List.of(0, 1).contains(code)) {
             throw new ExternalServiceException("IsDayOff error: " + codeDescription);
         }
         
+        IsDayOffServiceResponse isDayOffServiceResponse = new IsDayOffServiceResponse();
+        isDayOffServiceResponse.setWorkingDay(code == 0);
+        isDayOffServiceResponse.setCode(code);
+        isDayOffServiceResponse.setMessage(codeDescription);
+        
         log.info("Date=\"{}\" - {}", date, codeDescription);
-        return code == 0;
+        return isDayOffServiceResponse;
     }
 }
