@@ -1,6 +1,5 @@
 package com.github.evgenylizogubov.publicvoting.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.GeneratedValue;
@@ -12,8 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.domain.Persistable;
-import org.springframework.util.Assert;
 
 @MappedSuperclass
 @Access(AccessType.FIELD)
@@ -21,19 +18,8 @@ import org.springframework.util.Assert;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseEntity implements Persistable<Integer> {
+public abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Integer id;
-    
-    public int id() {
-        Assert.notNull(id, "Entity must have id");
-        return id;
-    }
-    
-    @Override
-    @JsonIgnore
-    public boolean isNew() {
-        return id == null;
-    }
 }

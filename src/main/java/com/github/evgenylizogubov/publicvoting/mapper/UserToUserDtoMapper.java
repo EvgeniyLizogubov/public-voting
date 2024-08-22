@@ -5,5 +5,5 @@ import com.github.evgenylizogubov.publicvoting.model.User;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper extends BaseMapper<User, UserDto> {
+public interface UserToUserDtoMapper extends BaseMapper<User, UserDto> {
 }
