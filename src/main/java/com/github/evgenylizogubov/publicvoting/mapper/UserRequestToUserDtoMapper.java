@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface UserDtoMapper extends BaseMapper<UserDto, UserRequest> {
+public interface UserRequestToUserDtoMapper extends BaseMapper<UserDto, UserRequest> {
     @Mapping(target = "email", expression = "java(dto.getEmail().toLowerCase())")
     @Mapping(target = "roles", expression = "java({Role.USER})")
     @Override

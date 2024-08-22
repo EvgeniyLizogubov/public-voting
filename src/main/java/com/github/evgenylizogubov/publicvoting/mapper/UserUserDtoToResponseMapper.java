@@ -5,5 +5,5 @@ import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserResponse;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface UserResponseMapper extends BaseMapper<UserDto, UserResponse> {
+public interface UserUserDtoToResponseMapper extends BaseMapper<UserDto, UserResponse> {
 }
