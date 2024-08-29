@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ public class Voting extends BaseEntity {
     private Theme theme;
     
     @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private boolean isActive = false;
+    private Boolean isActive = false;
     
     @Column(name = "start_getting_suggestions_date")
     private LocalDate startGettingSuggestionsDate;
@@ -41,4 +42,8 @@ public class Voting extends BaseEntity {
     
     @OneToMany(mappedBy = "voting")
     private Set<Vote> votes;
+    
+    @OneToOne
+    @JoinColumn(name = "winning_suggestion", referencedColumnName = "id")
+    private Suggestion winningSuggestion;
 }
