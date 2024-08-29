@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class SuggestionController {
-    static final String REST_URL = "/api/suggestions";
+    public static final String REST_URL = "/api/suggestions";
     
     private final SuggestionService suggestionService;
     
