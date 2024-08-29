@@ -29,4 +29,18 @@
                    (2, 'USER');
         </sql>
     </changeSet>
+
+    <changeSet id="populate-theme" author="Lizogubov Eugeny">
+        <preConditions>
+            <and>
+                <tableExists tableName="theme"/>
+            </and>
+        </preConditions>
+        <sql>
+            INSERT INTO theme(description, is_used)
+            VALUES ('Благоустройство дворов', true),
+                   ('Благоустройство улиц', false),
+                   ('Благоустройство парков', false);
+        </sql>
+    </changeSet>
 </databaseChangeLog>

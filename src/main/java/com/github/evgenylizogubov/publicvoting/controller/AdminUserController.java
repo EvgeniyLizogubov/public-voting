@@ -3,8 +3,8 @@ package com.github.evgenylizogubov.publicvoting.controller;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserResponse;
-import com.github.evgenylizogubov.publicvoting.mapper.UserRequestToUserDtoMapper;
-import com.github.evgenylizogubov.publicvoting.mapper.UserUserDtoToResponseMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.user.UserRequestToUserDtoMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.user.UserDtoToResponseMapper;
 import com.github.evgenylizogubov.publicvoting.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class AdminUserController {
     static final String REST_URL = "/api/admin/users";
     
     private final UserRequestToUserDtoMapper userRequestToUserDtoMapper;
-    private final UserUserDtoToResponseMapper userUserDtoToResponseMapper;
+    private final UserDtoToResponseMapper userDtoToResponseMapper;
     private final UserService userService;
     
     @GetMapping("/{id}")
@@ -44,7 +44,7 @@ public class AdminUserController {
         if (userDto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id=" + id + " not found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(userUserDtoToResponseMapper.toDto(userDto));
+        return ResponseEntity.status(HttpStatus.OK).body(userDtoToResponseMapper.toDto(userDto));
     }
     
     @GetMapping("/by-email")
@@ -54,14 +54,14 @@ public class AdminUserController {
         if (userDto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with email \"" + email + "\" not found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(userUserDtoToResponseMapper.toDto(userDto));
+        return ResponseEntity.status(HttpStatus.OK).body(userDtoToResponseMapper.toDto(userDto));
     }
     
     @GetMapping
     public List<UserResponse> getAll() {
         log.info("getAll");
         List<UserDto> users = userService.getAll();
-        return userUserDtoToResponseMapper.toDtoList(users);
+        return userDtoToResponseMapper.toDtoList(users);
     }
     
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -71,14 +71,14 @@ public class AdminUserController {
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
-        return ResponseEntity.created(uriOfNewResource).body(userUserDtoToResponseMapper.toDto(created));
+        return ResponseEntity.created(uriOfNewResource).body(userDtoToResponseMapper.toDto(created));
     }
     
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse update(@Valid @RequestBody UserRequest userRequest, @PathVariable int id) {
         log.info("update {} with id={}", userRequest, id);
         UserDto updated = userService.update(userRequestToUserDtoMapper.toEntity(userRequest), id);
-        return userUserDtoToResponseMapper.toDto(updated);
+        return userDtoToResponseMapper.toDto(updated);
     }
     
     @DeleteMapping("/{id}")

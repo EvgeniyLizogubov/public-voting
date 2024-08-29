@@ -1,7 +1,7 @@
 package com.github.evgenylizogubov.publicvoting.config;
 
 import com.github.evgenylizogubov.publicvoting.controller.AuthUser;
-import com.github.evgenylizogubov.publicvoting.mapper.UserToUserDtoMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.user.UserToUserDtoMapper;
 import com.github.evgenylizogubov.publicvoting.model.User;
 import com.github.evgenylizogubov.publicvoting.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

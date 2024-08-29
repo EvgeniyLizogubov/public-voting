@@ -3,7 +3,7 @@ package com.github.evgenylizogubov.publicvoting.service;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.error.IllegalRequestDataException;
 import com.github.evgenylizogubov.publicvoting.error.NotFoundException;
-import com.github.evgenylizogubov.publicvoting.mapper.UserToUserDtoMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.user.UserToUserDtoMapper;
 import com.github.evgenylizogubov.publicvoting.model.User;
 import com.github.evgenylizogubov.publicvoting.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

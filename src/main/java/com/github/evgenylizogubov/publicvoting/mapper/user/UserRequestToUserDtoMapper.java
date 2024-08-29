@@ -1,7 +1,8 @@
-package com.github.evgenylizogubov.publicvoting.mapper;
+package com.github.evgenylizogubov.publicvoting.mapper.user;
 
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
+import com.github.evgenylizogubov.publicvoting.mapper.BaseMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

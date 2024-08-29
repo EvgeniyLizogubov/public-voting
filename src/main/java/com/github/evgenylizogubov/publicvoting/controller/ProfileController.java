@@ -1,11 +1,10 @@
 package com.github.evgenylizogubov.publicvoting.controller;
 
-import com.github.evgenylizogubov.publicvoting.controller.AuthUser;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserResponse;
-import com.github.evgenylizogubov.publicvoting.mapper.UserRequestToUserDtoMapper;
-import com.github.evgenylizogubov.publicvoting.mapper.UserUserDtoToResponseMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.user.UserDtoToResponseMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.user.UserRequestToUserDtoMapper;
 import com.github.evgenylizogubov.publicvoting.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +34,12 @@ public class ProfileController {
     
     private final UserService userService;
     private final UserRequestToUserDtoMapper userRequestToUserDtoMapper;
-    private final UserUserDtoToResponseMapper userUserDtoToResponseMapper;
+    private final UserDtoToResponseMapper userDtoToResponseMapper;
     
     @GetMapping
     public UserResponse get(@AuthenticationPrincipal AuthUser authUser) {
         log.info("get {}", authUser);
-        return userUserDtoToResponseMapper.toDto(authUser.getUserDto());
+        return userDtoToResponseMapper.toDto(authUser.getUserDto());
     }
     
     @DeleteMapping
@@ -56,7 +55,7 @@ public class ProfileController {
         UserDto created = userService.create(userRequestToUserDtoMapper.toEntity(userRequest));
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/" + created.getId()).build().toUri();
-        return ResponseEntity.created(uriOfNewResource).body(userUserDtoToResponseMapper.toDto(created));
+        return ResponseEntity.created(uriOfNewResource).body(userDtoToResponseMapper.toDto(created));
     }
     
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -64,6 +63,6 @@ public class ProfileController {
         log.info("update {} with id={}", userRequest, authUser.getUserDto().getId());
         UserDto userDto = authUser.getUserDto();
         UserDto updated = userService.update(userRequestToUserDtoMapper.updateFromDto(userDto, userRequest), userDto.getId());
-        return userUserDtoToResponseMapper.toDto(updated);
+        return userDtoToResponseMapper.toDto(updated);
     }
 }
