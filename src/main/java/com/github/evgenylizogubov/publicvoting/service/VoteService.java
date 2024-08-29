@@ -1,9 +1,7 @@
 package com.github.evgenylizogubov.publicvoting.service;
 
 import com.github.evgenylizogubov.publicvoting.error.IllegalRequestDataException;
-import com.github.evgenylizogubov.publicvoting.model.Suggestion;
 import com.github.evgenylizogubov.publicvoting.model.Vote;
-import com.github.evgenylizogubov.publicvoting.model.Voting;
 import com.github.evgenylizogubov.publicvoting.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +16,8 @@ public class VoteService {
         return voteRepository.findById(id).orElse(null);
     }
     
-    public int getCountAllByVotingAndChosenSuggestion(Voting voting, Suggestion suggestion) {
-        return voteRepository.countAllByVotingAndChosenSuggestion(voting, suggestion);
+    public int getCountAllByVotingIdAndChosenSuggestionId(int votingId, int suggestionId) {
+        return voteRepository.countAllByVotingIdAndChosenSuggestionId(votingId, suggestionId);
     }
     
     @Transactional
