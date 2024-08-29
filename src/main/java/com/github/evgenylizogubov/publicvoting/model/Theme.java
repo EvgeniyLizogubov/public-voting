@@ -19,4 +19,7 @@ public class Theme extends BaseEntity {
     @Column(name = "description", nullable = false, unique = true)
     @NotBlank
     private String description;
+    
+    @Column(name = "is_used", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isUsed = false;
 }
