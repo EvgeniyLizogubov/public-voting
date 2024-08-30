@@ -3,7 +3,7 @@ package com.github.evgenylizogubov.publicvoting.service;
 import com.github.evgenylizogubov.publicvoting.controller.dto.theme.ThemeDto;
 import com.github.evgenylizogubov.publicvoting.error.IllegalRequestDataException;
 import com.github.evgenylizogubov.publicvoting.error.NotFoundException;
-import com.github.evgenylizogubov.publicvoting.mapper.theme.ThemeToThemeDtoMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.theme.ThemeDtoToThemeMapper;
 import com.github.evgenylizogubov.publicvoting.model.Theme;
 import com.github.evgenylizogubov.publicvoting.repository.ThemeRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +17,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ThemeService {
     private final ThemeRepository themeRepository;
-    private final ThemeToThemeDtoMapper themeToThemeDtoMapper;
+    private final ThemeDtoToThemeMapper themeDtoToThemeMapper;
 
     public ThemeDto get(int id) {
         Optional<Theme> theme = themeRepository.findById(id);
-        return theme.map(themeToThemeDtoMapper::toDto).orElse(null);
+        return theme.map(themeDtoToThemeMapper::toDto).orElse(null);
     }
 
     public List<ThemeDto> getAll() {
-        return themeToThemeDtoMapper.toDtoList(themeRepository.findAll());
+        return themeDtoToThemeMapper.toDtoList(themeRepository.findAll());
     }
     
     public Theme getFirstUnused() {
@@ -43,8 +43,8 @@ public class ThemeService {
                     "\" already exists");
         }
         
-        Theme saved = themeRepository.save(themeToThemeDtoMapper.toEntity(themeDto));
-        return themeToThemeDtoMapper.toDto(saved);
+        Theme saved = themeRepository.save(themeDtoToThemeMapper.toEntity(themeDto));
+        return themeDtoToThemeMapper.toDto(saved);
     }
 
     @Transactional
@@ -60,8 +60,8 @@ public class ThemeService {
         }
 
         themeDto.setId(id);
-        Theme updated = themeRepository.save(themeToThemeDtoMapper.toEntity(themeDto));
-        return themeToThemeDtoMapper.toDto(updated);
+        Theme updated = themeRepository.save(themeDtoToThemeMapper.toEntity(themeDto));
+        return themeDtoToThemeMapper.toDto(updated);
     }
 
     public int delete(int id) {
