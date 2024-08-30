@@ -3,7 +3,7 @@ package com.github.evgenylizogubov.publicvoting.controller;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserRequest;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserResponse;
-import com.github.evgenylizogubov.publicvoting.mapper.user.UserDtoToResponseMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.user.UserDtoToUserResponseMapper;
 import com.github.evgenylizogubov.publicvoting.mapper.user.UserRequestToUserDtoMapper;
 import com.github.evgenylizogubov.publicvoting.service.UserService;
 import jakarta.validation.Valid;
@@ -34,12 +34,12 @@ public class ProfileController {
     
     private final UserService userService;
     private final UserRequestToUserDtoMapper userRequestToUserDtoMapper;
-    private final UserDtoToResponseMapper userDtoToResponseMapper;
+    private final UserDtoToUserResponseMapper userDtoToUserResponseMapper;
     
     @GetMapping
     public UserResponse get(@AuthenticationPrincipal AuthUser authUser) {
         log.info("get {}", authUser);
-        return userDtoToResponseMapper.toDto(authUser.getUserDto());
+        return userDtoToUserResponseMapper.toResponse(authUser.getUserDto());
     }
     
     @DeleteMapping
@@ -52,17 +52,17 @@ public class ProfileController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRequest userRequest) {
         log.info("registered {}", userRequest);
-        UserDto created = userService.create(userRequestToUserDtoMapper.toEntity(userRequest));
+        UserDto created = userService.create(userRequestToUserDtoMapper.toDto(userRequest));
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/" + created.getId()).build().toUri();
-        return ResponseEntity.created(uriOfNewResource).body(userDtoToResponseMapper.toDto(created));
+        return ResponseEntity.created(uriOfNewResource).body(userDtoToUserResponseMapper.toResponse(created));
     }
     
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse update(@RequestBody @Valid UserRequest userRequest, @AuthenticationPrincipal AuthUser authUser) {
         log.info("update {} with id={}", userRequest, authUser.getUserDto().getId());
         UserDto userDto = authUser.getUserDto();
-        UserDto updated = userService.update(userRequestToUserDtoMapper.updateFromDto(userDto, userRequest), userDto.getId());
-        return userDtoToResponseMapper.toDto(updated);
+        UserDto updated = userService.update(userRequestToUserDtoMapper.updateFromRequest(userDto, userRequest), userDto.getId());
+        return userDtoToUserResponseMapper.toResponse(updated);
     }
 }
