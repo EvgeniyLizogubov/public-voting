@@ -1,10 +1,10 @@
 package com.github.evgenylizogubov.publicvoting.service;
 
 import com.github.evgenylizogubov.publicvoting.controller.dto.voting.VotingDto;
-import com.github.evgenylizogubov.publicvoting.error.NotFoundException;
 import com.github.evgenylizogubov.publicvoting.mapper.voting.VotingDtoToVotingMapper;
 import com.github.evgenylizogubov.publicvoting.model.Suggestion;
 import com.github.evgenylizogubov.publicvoting.model.Theme;
+import com.github.evgenylizogubov.publicvoting.model.User;
 import com.github.evgenylizogubov.publicvoting.model.Vote;
 import com.github.evgenylizogubov.publicvoting.model.Voting;
 import com.github.evgenylizogubov.publicvoting.repository.VotingRepository;
@@ -19,6 +19,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,32 +40,9 @@ public class VotingService {
         return voting.map(votingDtoToVotingMapper::toDto).orElse(null);
     }
     
-    public List<VotingDto> getAllActive() {
-        List<Voting> activeVoting = votingRepository.findAllByIsActiveIsTrueOrderByStartGettingSuggestionsDateAsc();
-        return votingDtoToVotingMapper.toDtoList(activeVoting);
-    }
-    
-    public VotingDto getCurrentActive() {
-        List<Voting> voting = votingRepository.findCurrentActive(LocalDate.now());
-        Voting currentActiveVoting = null;
-        
-        for (Voting v : voting) {
-            if (!LocalDate.now().isBefore(v.getStartGettingSuggestionsDate())) {
-                if (!LocalDate.now().isAfter(v.getStartGettingSuggestionsDate().plusDays(votingStageDuration))) {
-                    currentActiveVoting = v;
-                    break;
-                } else {
-                    finishVoting(v);
-                }
-            }
-        }
-        
-        return votingDtoToVotingMapper.toDto(currentActiveVoting);
-    }
-    
-    public VotingDto getLastFinished() {
-        Voting lastFinished = votingRepository.findFirstByIsActiveIsFalseOrderByStartGettingVotesDateDesc();
-        return votingDtoToVotingMapper.toDto(lastFinished);
+    public VotingDto getActive() {
+        Voting active = votingRepository.findByIsActiveIsTrue();
+        return active == null ? null : votingDtoToVotingMapper.toDto(active);
     }
     
     @Transactional
@@ -74,14 +52,21 @@ public class VotingService {
             return null;
         }
         
-        LocalDate startGettingSuggestionsDate = getStartGettingSuggestionsDate();
+        theme.setIsUsed(true);
+        
+        Voting active = votingRepository.findByIsActiveIsTrue();
+        
+        LocalDate startGettingSuggestionsDate = getStartGettingSuggestionsDate(active);
         LocalDate startGettingVotesDate = getStartGettingVotesDate(startGettingSuggestionsDate);
+        
+        if (active != null) {
+            finishVoting(active);
+        }
         
         Voting voting = new Voting();
         voting.setTheme(theme);
         voting.setStartGettingSuggestionsDate(startGettingSuggestionsDate);
         voting.setStartGettingVotesDate(startGettingVotesDate);
-        voting.setIsActive(true);
         
         Voting created = votingRepository.save(voting);
         return votingDtoToVotingMapper.toDto(created);
@@ -92,29 +77,16 @@ public class VotingService {
         return votingDtoToVotingMapper.toDtoList(voting);
     }
     
-    @Transactional
-    public VotingDto update(VotingDto votingDto, int id) {
-        if (!votingRepository.existsById(id)) {
-            throw new NotFoundException("Theme with id=" + id + " not found");
-        }
-        
-        votingDto.setId(id);
-        Voting updated = votingRepository.save(votingDtoToVotingMapper.toEntity(votingDto));
-        return votingDtoToVotingMapper.toDto(updated);
-    }
-    
     public int delete(int id) {
         return votingRepository.removeById(id);
     }
     
-    private LocalDate getStartGettingSuggestionsDate() {
-        Voting lastActiveVoting = votingRepository.findFirstByIsActiveIsTrueOrderByStartGettingSuggestionsDateDesc();
-        
+    private LocalDate getStartGettingSuggestionsDate(Voting previousVoting) {
         TemporalAdjuster temporalAdjuster = TemporalAdjusters.firstDayOfNextMonth();
         LocalDate date =
-                lastActiveVoting == null ?
-                LocalDate.now() :
-                lastActiveVoting.getStartGettingSuggestionsDate().with(temporalAdjuster);
+                previousVoting == null ?
+                        LocalDate.now() :
+                        previousVoting.getStartGettingSuggestionsDate().with(temporalAdjuster);
         int halfMonth = date.lengthOfMonth() / 2;
         
         if (date.getDayOfMonth() > halfMonth) {
@@ -143,16 +115,21 @@ public class VotingService {
     }
     
     private void finishVoting(Voting votingToFinish) {
+        votingToFinish.getTheme().setIsUsed(true);
+        
         Set<Vote> votes = votingToFinish.getVotes();
         Map<Suggestion, Long> elementsCounts = votes.stream()
                 .collect(Collectors.groupingBy(Vote::getChosenSuggestion, Collectors.counting()));
         
         List<Suggestion> mostFrequentSuggestions = elementsCounts.entrySet().stream()
-                .filter(entry -> entry.getValue() == Collections.max(elementsCounts.values()))
+                .filter(entry -> Objects.equals(entry.getValue(), Collections.max(elementsCounts.values())))
                 .map(Map.Entry::getKey)
                 .toList();
         
         if (mostFrequentSuggestions.size() == 1) {
+            User winner = mostFrequentSuggestions.getFirst().getUser();
+            winner.setPoints(winner.getPoints() + 1);
+            
             votingToFinish.setWinningSuggestion(mostFrequentSuggestions.getFirst());
         }
         
