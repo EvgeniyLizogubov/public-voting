@@ -8,5 +8,5 @@ import lombok.Value;
 @Value
 public class ThemeResponse extends BaseDto {
     private final String description;
-    private final Boolean isActive;
+    private final Boolean isUsed;
 }

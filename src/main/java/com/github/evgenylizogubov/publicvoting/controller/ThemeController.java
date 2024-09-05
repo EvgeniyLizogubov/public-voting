@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,6 +54,7 @@ public class ThemeController {
         return themeDtoToThemeResponseMapper.toResponseList(themes);
     }
     
+    @Secured("ROLE_ADMIN")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ThemeResponse> createWithLocation(@Valid @RequestBody ThemeRequest themeRequest) {
         log.info("create {}", themeRequest);
@@ -63,6 +65,7 @@ public class ThemeController {
         return ResponseEntity.created(uriOfNewResource).body(themeDtoToThemeResponseMapper.toResponse(created));
     }
     
+    @Secured("ROLE_ADMIN")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ThemeResponse update(@Valid @RequestBody ThemeRequest themeRequest, @PathVariable int id) {
         log.info("update {} with id={}", themeRequest, id);
@@ -70,6 +73,7 @@ public class ThemeController {
         return themeDtoToThemeResponseMapper.toResponse(updated);
     }
     
+    @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
         log.info("delete {}", id);

@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class ThemeDto extends BaseDto {
     private String description;
-    private Boolean isActive;
+    private Boolean isUsed;
 }

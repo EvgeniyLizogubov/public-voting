@@ -31,7 +31,7 @@ public class ThemeService {
     public Theme getFirstUnused() {
         Theme theme = themeRepository.getFirstByIsUsedFalse();
         if (theme == null) {
-            themeRepository.resetUsage();
+            themeRepository.setUsageForAll(false);
         }
         return themeRepository.getFirstByIsUsedFalse();
     }
@@ -53,8 +53,8 @@ public class ThemeService {
             throw new NotFoundException("Theme with id=" + id + " not found");
         }
 
-        Optional<Theme> checkedTheme = themeRepository.findByDescription(themeDto.getDescription());
-        if (checkedTheme.isPresent() && checkedTheme.get().getId() != id) {
+        Theme checkedTheme = themeRepository.findByDescription(themeDto.getDescription());
+        if (checkedTheme != null && checkedTheme.getId() != id) {
             throw new IllegalRequestDataException("Theme with description \"" + themeDto.getDescription() +
                     "\" already exists");
         }
