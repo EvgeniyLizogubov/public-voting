@@ -1,56 +1,46 @@
 package com.github.evgenylizogubov.publicvoting.controller;
 
 import com.github.evgenylizogubov.publicvoting.controller.dto.vote.VoteDto;
-import com.github.evgenylizogubov.publicvoting.controller.dto.vote.VoteRequest;
 import com.github.evgenylizogubov.publicvoting.mapper.vote.VoteDtoToVoteResponseMapper;
-import com.github.evgenylizogubov.publicvoting.mapper.vote.VoteRequestToVoteDtoMapper;
 import com.github.evgenylizogubov.publicvoting.service.VoteService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = VotingController.REST_URL, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = VoteController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Slf4j
 public class VoteController {
     static final String REST_URL = "/api/votes";
     
     private final VoteService voteService;
-    private final VoteRequestToVoteDtoMapper voteRequestToVoteDtoMapper;
     private final VoteDtoToVoteResponseMapper voteDtoToVoteResponseMapper;
     
     @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable int id) {
+    public ResponseEntity<?> get(@PathVariable int id, @AuthenticationPrincipal AuthUser authUser) {
         log.info("get {}", id);
-        VoteDto vote = voteService.get(id);
+        VoteDto vote = voteService.get(id, authUser.getUserDto());
         if (vote == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vote with id=" + id + " not found");
         }
         return ResponseEntity.status(HttpStatus.OK).body(voteDtoToVoteResponseMapper.toResponse(vote));
     }
     
-    @GetMapping("/count-by-voting-and-suggestion")
-    public int getCountByVotingIdAndSuggestionId(@RequestParam int votingId, @RequestParam int suggestionId) {
-        log.info("get count by voting id={} and suggestion id={}", votingId, suggestionId);
-        return voteService.getCountAllByVotingIdAndChosenSuggestionId(votingId, suggestionId);
-    }
-    
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@Valid @RequestBody VoteRequest voteRequest) {
-        log.info("create {}", voteRequest);
-        voteService.create(voteRequestToVoteDtoMapper.toDto(voteRequest));
+    public void vote(@RequestParam int chosenSuggestionId, @AuthenticationPrincipal AuthUser authUser) {
+        log.info("user {} votes for the suggestion with id = {} ", authUser.getUserDto(), chosenSuggestionId);
+        voteService.create(chosenSuggestionId, authUser.getUserDto());
     }
 }

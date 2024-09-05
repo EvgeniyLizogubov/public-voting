@@ -20,7 +20,8 @@ public class WebClientConfig {
         HttpClient httpClient = HttpClient
                 .create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT)
-                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS)));
+                .doOnConnected(connection ->
+                        connection.addHandlerLast(new ReadTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS)));
         
         return WebClient.builder()
                 .baseUrl(BASE_URL)

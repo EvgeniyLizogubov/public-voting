@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VoteRepository extends JpaRepository<Vote, Integer> {
-    int countAllByVotingIdAndChosenSuggestionId(int votingId, int suggestionId);
+    Vote findByIdAndUser(int id, User user);
     
     boolean existsByVotingAndUser(Voting voting, User user);
 }
