@@ -8,16 +8,15 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface SuggestionRepository extends JpaRepository<Suggestion, Integer> {
     @Transactional
     int removeById(int id);
     
-    List<Suggestion> findAllByVoting(Voting voting);
+    List<Suggestion> findAllByVotingId(int votingId);
     
-    Optional<Suggestion> findByDescriptionAndVoting(String description, Voting voting);
+    Suggestion findByDescriptionAndVoting(String description, Voting voting);
     
     boolean existsByDescriptionAndVoting(String description, Voting voting);
     
