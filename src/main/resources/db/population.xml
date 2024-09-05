@@ -11,7 +11,9 @@
         <sql>
             INSERT INTO users(first_name, last_name, email, password)
             VALUES ('User', 'Userov', 'user@mail.ru', '$2a$10$SZLkhN4nHTVe.25IL1iMEOtb8L6E7YEB2MkDwVHm2V/auVK/SfhRC'),
-                   ('Admin', 'Adminov', 'admin@gmail.com', '$2a$10$/VzDUIIZfUtr/mvRJY0t8eAfre4cw68cwKblSz3xMh5EqAVf60HCe');
+                   ('Admin', 'Adminov', 'admin@gmail.com', '$2a$10$/VzDUIIZfUtr/mvRJY0t8eAfre4cw68cwKblSz3xMh5EqAVf60HCe'),
+                   ('Petr', 'Petrov', 'petr@mail.ru', '$2a$10$cykV8FeSSf.L7DqSVI9yau86FgTeDFfdi6wgL2/yql2W8UCAEcD2i'),
+                   ('Ivan', 'Ivanov', 'ivan@mail.ru', '$2a$10$aZeIworXhPPVf4NOC6BKCORis56YoMqYrhhBBH2b8AP3cVxdO1Zbq');
         </sql>
     </changeSet>
 
@@ -26,7 +28,9 @@
             INSERT INTO user_role(user_id, role)
             VALUES (1, 'USER'),
                    (2, 'ADMIN'),
-                   (2, 'USER');
+                   (2, 'USER'),
+                   (3, 'USER'),
+                   (4, 'USER')
         </sql>
     </changeSet>
 
@@ -39,8 +43,63 @@
         <sql>
             INSERT INTO theme(description, is_used)
             VALUES ('Благоустройство дворов', true),
-                   ('Благоустройство улиц', false),
+                   ('Благоустройство улиц', true),
                    ('Благоустройство парков', false);
+        </sql>
+    </changeSet>
+
+    <changeSet id="populate-voting" author="Lizogubov Eugeny">
+        <preConditions>
+            <and>
+                <tableExists tableName="theme"/>
+                <tableExists tableName="voting"/>
+            </and>
+        </preConditions>
+        <sql>
+            INSERT INTO voting(theme_id, is_active, start_getting_suggestions_date, start_getting_votes_date, winning_suggestion)
+            VALUES (1, false, NOW() - interval '1 month', NOW()  - interval '1 month' + interval '1 week', null),
+                   (2, true, NOW(), NOW() + interval '1 week', null);
+        </sql>
+    </changeSet>
+
+    <changeSet id="populate-suggestion" author="Lizogubov Eugeny">
+        <preConditions>
+            <and>
+                <tableExists tableName="users"/>
+                <tableExists tableName="voting"/>
+                <tableExists tableName="suggestion"/>
+            </and>
+        </preConditions>
+        <sql>
+            INSERT INTO suggestion(description, voting_id, user_id)
+            VALUES ('Установить лавочку', 1, 1),
+                   ('Покрасить забор', 1, 2),
+                   ('Снести гаражи', 1, 3),
+                   ('Заменить бордюры', 2, 1),
+                   ('Заменить асфальт', 2, 4);
+
+            UPDATE voting SET winning_suggestion = 2 WHERE id = 1;
+        </sql>
+    </changeSet>
+
+    <changeSet id="populate-vote" author="Lizogubov Eugeny">
+        <preConditions>
+            <and>
+                <tableExists tableName="users"/>
+                <tableExists tableName="voting"/>
+                <tableExists tableName="suggestion"/>
+                <tableExists tableName="vote"/>
+            </and>
+        </preConditions>
+        <sql>
+            INSERT INTO vote(voting_id, suggestion_id, user_id)
+            VALUES (1, 2, 1),
+                   (1, 2, 3),
+                   (1, 3, 2),
+                   (1, 1, 4),
+                   (2, 4, 4),
+                   (2, 5, 3),
+                   (2, 4, 1);
         </sql>
     </changeSet>
 </databaseChangeLog>

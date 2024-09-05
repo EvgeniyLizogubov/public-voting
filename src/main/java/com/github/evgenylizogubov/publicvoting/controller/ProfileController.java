@@ -59,10 +59,14 @@ public class ProfileController {
     }
     
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public UserResponse update(@RequestBody @Valid UserRequest userRequest, @AuthenticationPrincipal AuthUser authUser) {
+    public UserResponse update(
+            @RequestBody @Valid UserRequest userRequest,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
         log.info("update {} with id={}", userRequest, authUser.getUserDto().getId());
         UserDto userDto = authUser.getUserDto();
-        UserDto updated = userService.update(userRequestToUserDtoMapper.updateFromRequest(userDto, userRequest), userDto.getId());
+        UserDto updated = userService
+                .update(userRequestToUserDtoMapper.updateFromRequest(userDto, userRequest), userDto.getId());
         return userDtoToUserResponseMapper.toResponse(updated);
     }
 }

@@ -52,7 +52,8 @@ public class AdminUserController {
         log.info("getByEmail {}", email);
         UserDto userDto = userService.getByEmail(email);
         if (userDto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with email \"" + email + "\" not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with email \"" + email
+                    + "\" not found");
         }
         return ResponseEntity.status(HttpStatus.OK).body(userDtoToUserResponseMapper.toResponse(userDto));
     }

@@ -52,7 +52,7 @@ public class User extends BaseEntity {
     private String password;
     
     @Column(name = "points", columnDefinition = "INTEGER DEFAULT 0")
-    private int points;
+    private int points = 0;
     
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_role",

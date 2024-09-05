@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @Slf4j
 @Component
@@ -22,8 +20,11 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         log.debug("Authentication by '{}'", email);
-        Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(email);
-        User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User '" + email + "' was not found"));
+        User user = userRepository.findByEmailIgnoreCase(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User '" + email + "' was not found");
+        }
+        
         return new AuthUser(userDtoToUserMapper.toDto(user));
     }
 }

@@ -27,8 +27,8 @@ public class UserService {
     }
     
     public UserDto getByEmail(String email) {
-        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
-        return user.map(userDtoToUserMapper::toDto).orElse(null);
+        User user = userRepository.findByEmailIgnoreCase(email);
+        return user == null ? null : userDtoToUserMapper.toDto(user);
     }
     
     public List<UserDto> getAll() {
@@ -54,10 +54,10 @@ public class UserService {
             throw new NotFoundException("User with id=" + id + " not found");
         }
         
-        Optional<User> checkedUser = userRepository.findByEmailIgnoreCase(userDto.getEmail());
-        if (checkedUser.isPresent() && checkedUser.get().getId() != id) {
-            throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() +
-                    "\" already exists");
+        User checkedUser = userRepository.findByEmailIgnoreCase(userDto.getEmail());
+        if (checkedUser != null && checkedUser.getId() != id) {
+            throw new IllegalRequestDataException("User with email '" + userDto.getEmail() +
+                    "' already exists");
         }
         
         userDto.setId(id);

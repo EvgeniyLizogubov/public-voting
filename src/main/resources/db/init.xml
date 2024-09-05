@@ -67,13 +67,13 @@
             (
                 id          SERIAL PRIMARY KEY,
                 description VARCHAR(200) NOT NULL UNIQUE,
-                voting_id   INTEGER      NOT NULL REFERENCES voting (id),
+                voting_id   INTEGER      NOT NULL REFERENCES voting (id) ON DELETE CASCADE,
                 user_id     INTEGER      NOT NULL REFERENCES users (id),
                 CONSTRAINT uk_user_voting UNIQUE (user_id, voting_id)
             );
 
             ALTER TABLE voting
-                ADD FOREIGN KEY (winning_suggestion) REFERENCES suggestion (id);
+                ADD FOREIGN KEY (winning_suggestion) REFERENCES suggestion (id) ON DELETE CASCADE;
         </sql>
     </changeSet>
 
@@ -87,7 +87,7 @@
             CREATE TABLE vote
             (
                 id            SERIAL PRIMARY KEY,
-                voting_id     INTEGER NOT NULL REFERENCES voting (id),
+                voting_id     INTEGER NOT NULL REFERENCES voting (id) ON DELETE CASCADE,
                 suggestion_id INTEGER NOT NULL REFERENCES suggestion (id),
                 user_id       INTEGER NOT NULL REFERENCES users (id),
                 CONSTRAINT uk_voting_user UNIQUE (voting_id, user_id)
