@@ -2,11 +2,13 @@ package com.github.evgenylizogubov.publicvoting.service;
 
 import com.github.evgenylizogubov.publicvoting.controller.dto.voting.VotingDto;
 import com.github.evgenylizogubov.publicvoting.mapper.voting.VotingDtoToVotingMapper;
+import com.github.evgenylizogubov.publicvoting.model.Certificate;
 import com.github.evgenylizogubov.publicvoting.model.Suggestion;
 import com.github.evgenylizogubov.publicvoting.model.Theme;
 import com.github.evgenylizogubov.publicvoting.model.User;
 import com.github.evgenylizogubov.publicvoting.model.Vote;
 import com.github.evgenylizogubov.publicvoting.model.Voting;
+import com.github.evgenylizogubov.publicvoting.repository.CertificateRepository;
 import com.github.evgenylizogubov.publicvoting.repository.UserRepository;
 import com.github.evgenylizogubov.publicvoting.repository.VotingRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +33,11 @@ import java.util.stream.Collectors;
 public class VotingService {
     private final VotingRepository votingRepository;
     private final UserRepository userRepository;
+    private final CertificateRepository certificateRepository;
     private final VotingDtoToVotingMapper votingDtoToVotingMapper;
     private final ThemeService themeService;
     private final IsDayOffService isDayOffService;
-    private final EmailService emailService;
+    private final CertificateService certificateService;
     
     @Value("${voting.stage.duration}")
     private int votingStageDuration;
@@ -135,7 +138,7 @@ public class VotingService {
             votingToFinish.setWinningSuggestion(mostFrequentSuggestions.getFirst());
         }
         
-        if (votingToFinish.getStartGettingVotesDate().getMonth() == Month.DECEMBER) {
+        if (votingToFinish.getStartGettingVotesDate().getMonth() == Month.SEPTEMBER) {
             int currentYear = votingToFinish.getStartGettingVotesDate().getYear();
             awardWinnerAtEndOfYear(currentYear);
         }
@@ -146,7 +149,8 @@ public class VotingService {
     private void awardWinnerAtEndOfYear(int year) {
         List<User> winners = userRepository.getUserByMaxPoints();
         if (winners.size() == 1) {
-            emailService.sendAwardingMessage(winners.getFirst(), year);
+            certificateService.sendByEmail(winners.getFirst(), year);
+            certificateRepository.save(new Certificate(year, winners.getFirst()));
         }
         
         userRepository.setPointsForAll(0);

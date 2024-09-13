@@ -20,4 +20,22 @@ public class GlobalExceptionHandler {
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+    
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<String> handlerExternalServiceException(ExternalServiceException ex) {
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
+    }
+    
+    @ExceptionHandler(FileLoadingException.class)
+    public ResponseEntity<String> handlerFileLoadingException(FileLoadingException ex) {
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+    
+    @ExceptionHandler(MailSendingException.class)
+    public ResponseEntity<String> handlerMailSendingException(MailSendingException ex) {
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
 }
