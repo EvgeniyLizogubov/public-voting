@@ -50,9 +50,9 @@ public class CertificateService {
             } catch (IOException e) {
                 throw new FileLoadingException("Error loading certificate with year=" + year);
             }
+        } else {
+            throw new NotFoundException("Certificate with year=" + year + " not found");
         }
-        
-        return null;
     }
     
     public void sendByEmail(User winner, int year) {
