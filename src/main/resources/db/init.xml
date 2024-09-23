@@ -25,10 +25,72 @@
         <sql>
             CREATE TABLE user_role
             (
-                user_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
                 role    VARCHAR NOT NULL,
-                CONSTRAINT uk_user_role UNIQUE (user_id, role),
-                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                CONSTRAINT uk_user_role UNIQUE (user_id, role)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="init-theme" author="Lizogubov Eugeny">
+        <sql>
+            CREATE TABLE theme
+            (
+                id          SERIAL PRIMARY KEY,
+                description VARCHAR(200) NOT NULL UNIQUE,
+                is_used     BOOLEAN DEFAULT FALSE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="init-voting" author="Lizogubov Eugeny">
+        <sql>
+            CREATE TABLE voting
+            (
+                id                             SERIAL PRIMARY KEY,
+                theme_id                       INTEGER NOT NULL,
+                is_active                      BOOLEAN DEFAULT FALSE,
+                start_getting_suggestions_date DATE,
+                start_getting_votes_date       DATE,
+                winning_suggestion             INTEGER
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="init-suggestion" author="Lizogubov Eugeny">
+        <preConditions>
+            <tableExists tableName="users"/>
+            <tableExists tableName="voting"/>
+        </preConditions>
+        <sql>
+            CREATE TABLE suggestion
+            (
+                id          SERIAL PRIMARY KEY,
+                description VARCHAR(200) NOT NULL UNIQUE,
+                voting_id   INTEGER      NOT NULL REFERENCES voting (id) ON DELETE CASCADE,
+                user_id     INTEGER      NOT NULL REFERENCES users (id),
+                CONSTRAINT uk_user_voting UNIQUE (user_id, voting_id)
+            );
+
+            ALTER TABLE voting
+                ADD FOREIGN KEY (winning_suggestion) REFERENCES suggestion (id) ON DELETE CASCADE;
+        </sql>
+    </changeSet>
+
+    <changeSet id="init-vote" author="Lizogubov Eugeny">
+        <preConditions>
+            <tableExists tableName="users"/>
+            <tableExists tableName="voting"/>
+            <tableExists tableName="suggestion"/>
+        </preConditions>
+        <sql>
+            CREATE TABLE vote
+            (
+                id            SERIAL PRIMARY KEY,
+                voting_id     INTEGER NOT NULL REFERENCES voting (id) ON DELETE CASCADE,
+                suggestion_id INTEGER NOT NULL REFERENCES suggestion (id),
+                user_id       INTEGER NOT NULL REFERENCES users (id),
+                CONSTRAINT uk_voting_user UNIQUE (voting_id, user_id)
             );
         </sql>
     </changeSet>

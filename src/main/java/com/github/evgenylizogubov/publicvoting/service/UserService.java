@@ -3,7 +3,7 @@ package com.github.evgenylizogubov.publicvoting.service;
 import com.github.evgenylizogubov.publicvoting.controller.dto.user.UserDto;
 import com.github.evgenylizogubov.publicvoting.error.IllegalRequestDataException;
 import com.github.evgenylizogubov.publicvoting.error.NotFoundException;
-import com.github.evgenylizogubov.publicvoting.mapper.UserToUserDtoMapper;
+import com.github.evgenylizogubov.publicvoting.mapper.user.UserDtoToUserMapper;
 import com.github.evgenylizogubov.publicvoting.model.User;
 import com.github.evgenylizogubov.publicvoting.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,21 +18,21 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final UserToUserDtoMapper userToUserDtoMapper;
+    private final UserDtoToUserMapper userDtoToUserMapper;
     private final PasswordEncoder passwordEncoder;
     
     public UserDto get(int id) {
         Optional<User> user = userRepository.findById(id);
-        return user.map(userToUserDtoMapper::toDto).orElse(null);
+        return user.map(userDtoToUserMapper::toDto).orElse(null);
     }
     
     public UserDto getByEmail(String email) {
-        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
-        return user.map(userToUserDtoMapper::toDto).orElse(null);
+        User user = userRepository.findByEmailIgnoreCase(email);
+        return user == null ? null : userDtoToUserMapper.toDto(user);
     }
     
     public List<UserDto> getAll() {
-        return userToUserDtoMapper.toDtoList(userRepository.findAll());
+        return userDtoToUserMapper.toDtoList(userRepository.findAll());
     }
     
     @Transactional
@@ -43,10 +42,10 @@ public class UserService {
                     "\" already exists");
         }
         
-        User user = userToUserDtoMapper.toEntity(userDto);
+        User user = userDtoToUserMapper.toEntity(userDto);
         prepareToSave(user);
         User saved = userRepository.save(user);
-        return userToUserDtoMapper.toDto(saved);
+        return userDtoToUserMapper.toDto(saved);
     }
     
     @Transactional
@@ -55,17 +54,17 @@ public class UserService {
             throw new NotFoundException("User with id=" + id + " not found");
         }
         
-        Optional<User> checkedUser = userRepository.findByEmailIgnoreCase(userDto.getEmail());
-        if (checkedUser.isPresent() && checkedUser.get().getId() != id) {
-            throw new IllegalRequestDataException("User with email \"" + userDto.getEmail() +
-                    "\" already exists");
+        User checkedUser = userRepository.findByEmailIgnoreCase(userDto.getEmail());
+        if (checkedUser != null && checkedUser.getId() != id) {
+            throw new IllegalRequestDataException("User with email '" + userDto.getEmail() +
+                    "' already exists");
         }
         
         userDto.setId(id);
-        User user = userToUserDtoMapper.toEntity(userDto);
+        User user = userDtoToUserMapper.toEntity(userDto);
         prepareToSave(user);
         User updated = userRepository.save(user);
-        return userToUserDtoMapper.toDto(updated);
+        return userDtoToUserMapper.toDto(updated);
     }
     
     public int delete(int id) {

@@ -20,10 +20,11 @@ public class IsDayOffService {
     
     public IsDayOffServiceResponse getDateInfo(LocalDate date) {
         log.info("Check date=\"{}\" for weekend or holiday", date);
-        String response = webClient.get()
+        Integer response = webClient.get()
                 .uri("/" + date)
                 .retrieve()
                 .bodyToMono(String.class)
+                .mapNotNull(Integer::parseInt)
                 .block();
         
         if (response == null) {
@@ -31,7 +32,7 @@ public class IsDayOffService {
             throw new ExternalServiceException("IsDayOff service not available");
         }
         
-        int code = Integer.parseInt(response);
+        int code = response;
         String codeDescription = messageSource.getMessage(
                 Integer.toString(code), null, LocaleContextHolder.getLocale()
         );
@@ -40,12 +41,13 @@ public class IsDayOffService {
             throw new ExternalServiceException("IsDayOff error: " + codeDescription);
         }
         
+        log.info("Date=\"{}\" - {}", date, codeDescription);
+        
         IsDayOffServiceResponse isDayOffServiceResponse = new IsDayOffServiceResponse();
+        isDayOffServiceResponse.setDate(date);
         isDayOffServiceResponse.setWorkingDay(code == 0);
         isDayOffServiceResponse.setCode(code);
         isDayOffServiceResponse.setMessage(codeDescription);
-        
-        log.info("Date=\"{}\" - {}", date, codeDescription);
         return isDayOffServiceResponse;
     }
 }
