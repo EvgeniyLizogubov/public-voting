@@ -9,11 +9,11 @@
             <tableExists tableName="users"/>
         </preConditions>
         <sql>
-            INSERT INTO users(first_name, last_name, email, password)
-            VALUES ('User', 'Userov', 'user@mail.ru', '$2a$10$SZLkhN4nHTVe.25IL1iMEOtb8L6E7YEB2MkDwVHm2V/auVK/SfhRC'),
-                   ('Admin', 'Adminov', 'admin@gmail.com', '$2a$10$/VzDUIIZfUtr/mvRJY0t8eAfre4cw68cwKblSz3xMh5EqAVf60HCe'),
-                   ('Petr', 'Petrov', 'petr@mail.ru', '$2a$10$cykV8FeSSf.L7DqSVI9yau86FgTeDFfdi6wgL2/yql2W8UCAEcD2i'),
-                   ('Ivan', 'Ivanov', 'ivan@mail.ru', '$2a$10$aZeIworXhPPVf4NOC6BKCORis56YoMqYrhhBBH2b8AP3cVxdO1Zbq');
+            INSERT INTO users(first_name, last_name, email, password, points)
+            VALUES ('User', 'Userov', 'user@mail.ru', '$2a$10$SZLkhN4nHTVe.25IL1iMEOtb8L6E7YEB2MkDwVHm2V/auVK/SfhRC', 0),
+                   ('Admin', 'Adminov', 'admin@gmail.com', '$2a$10$/VzDUIIZfUtr/mvRJY0t8eAfre4cw68cwKblSz3xMh5EqAVf60HCe', 1),
+                   ('Petr', 'Petrov', 'petr@mail.ru', '$2a$10$cykV8FeSSf.L7DqSVI9yau86FgTeDFfdi6wgL2/yql2W8UCAEcD2i', 0),
+                   ('Ivan', 'Ivanov', 'ivan@mail.ru', '$2a$10$aZeIworXhPPVf4NOC6BKCORis56YoMqYrhhBBH2b8AP3cVxdO1Zbq', 0);
         </sql>
     </changeSet>
 
@@ -75,7 +75,7 @@
             VALUES ('Установить лавочку', 1, 1),
                    ('Покрасить забор', 1, 2),
                    ('Снести гаражи', 1, 3),
-                   ('Заменить бордюры', 2, 1),
+                   ('Заменить бордюры', 2, 2),
                    ('Заменить асфальт', 2, 4);
 
             UPDATE voting SET winning_suggestion = 2 WHERE id = 1;

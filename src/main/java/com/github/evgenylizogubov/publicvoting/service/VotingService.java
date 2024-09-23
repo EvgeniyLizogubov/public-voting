@@ -2,11 +2,14 @@ package com.github.evgenylizogubov.publicvoting.service;
 
 import com.github.evgenylizogubov.publicvoting.controller.dto.voting.VotingDto;
 import com.github.evgenylizogubov.publicvoting.mapper.voting.VotingDtoToVotingMapper;
+import com.github.evgenylizogubov.publicvoting.model.Certificate;
 import com.github.evgenylizogubov.publicvoting.model.Suggestion;
 import com.github.evgenylizogubov.publicvoting.model.Theme;
 import com.github.evgenylizogubov.publicvoting.model.User;
 import com.github.evgenylizogubov.publicvoting.model.Vote;
 import com.github.evgenylizogubov.publicvoting.model.Voting;
+import com.github.evgenylizogubov.publicvoting.repository.CertificateRepository;
+import com.github.evgenylizogubov.publicvoting.repository.UserRepository;
 import com.github.evgenylizogubov.publicvoting.repository.VotingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
@@ -28,9 +32,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class VotingService {
     private final VotingRepository votingRepository;
+    private final UserRepository userRepository;
+    private final CertificateRepository certificateRepository;
     private final VotingDtoToVotingMapper votingDtoToVotingMapper;
     private final ThemeService themeService;
     private final IsDayOffService isDayOffService;
+    private final CertificateService certificateService;
     
     @Value("${voting.stage.duration}")
     private int votingStageDuration;
@@ -54,21 +61,21 @@ public class VotingService {
         
         theme.setIsUsed(true);
         
-        Voting active = votingRepository.findByIsActiveIsTrue();
+        Voting activeVoting = votingRepository.findByIsActiveIsTrue();
         
-        LocalDate startGettingSuggestionsDate = getStartGettingSuggestionsDate(active);
+        LocalDate startGettingSuggestionsDate = getStartGettingSuggestionsDate(activeVoting);
         LocalDate startGettingVotesDate = getStartGettingVotesDate(startGettingSuggestionsDate);
         
-        if (active != null) {
-            finishVoting(active);
+        if (activeVoting != null) {
+            finishVoting(activeVoting);
         }
         
-        Voting voting = new Voting();
-        voting.setTheme(theme);
-        voting.setStartGettingSuggestionsDate(startGettingSuggestionsDate);
-        voting.setStartGettingVotesDate(startGettingVotesDate);
+        Voting newVoting = new Voting();
+        newVoting.setTheme(theme);
+        newVoting.setStartGettingSuggestionsDate(startGettingSuggestionsDate);
+        newVoting.setStartGettingVotesDate(startGettingVotesDate);
         
-        Voting created = votingRepository.save(voting);
+        Voting created = votingRepository.save(newVoting);
         return votingDtoToVotingMapper.toDto(created);
     }
     
@@ -115,8 +122,6 @@ public class VotingService {
     }
     
     private void finishVoting(Voting votingToFinish) {
-        votingToFinish.getTheme().setIsUsed(true);
-        
         Set<Vote> votes = votingToFinish.getVotes();
         Map<Suggestion, Long> elementsCounts = votes.stream()
                 .collect(Collectors.groupingBy(Vote::getChosenSuggestion, Collectors.counting()));
@@ -133,6 +138,21 @@ public class VotingService {
             votingToFinish.setWinningSuggestion(mostFrequentSuggestions.getFirst());
         }
         
+        if (votingToFinish.getStartGettingVotesDate().getMonth() == Month.SEPTEMBER) {
+            int currentYear = votingToFinish.getStartGettingVotesDate().getYear();
+            awardWinnerAtEndOfYear(currentYear);
+        }
+        
         votingToFinish.setIsActive(false);
+    }
+    
+    private void awardWinnerAtEndOfYear(int year) {
+        List<User> winners = userRepository.getUserByMaxPoints();
+        if (winners.size() == 1) {
+            certificateService.sendByEmail(winners.getFirst(), year);
+            certificateRepository.save(new Certificate(year, winners.getFirst()));
+        }
+        
+        userRepository.setPointsForAll(0);
     }
 }

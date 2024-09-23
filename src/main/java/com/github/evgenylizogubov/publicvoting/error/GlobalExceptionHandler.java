@@ -10,14 +10,37 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalRequestDataException.class)
-    public ResponseEntity<String> handleIllegalRequestDataException(IllegalRequestDataException ex) {
+    public ResponseEntity<ErrorResponse> handleIllegalRequestDataException(IllegalRequestDataException ex) {
         log.error(ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
     
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handlerNotFoundException(NotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handlerNotFoundException(NotFoundException ex) {
         log.error(ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+    
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<ErrorResponse> handlerExternalServiceException(ExternalServiceException ex) {
+        log.error(ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+    
+    @ExceptionHandler(FileLoadingException.class)
+    public ResponseEntity<ErrorResponse> handlerFileLoadingException(FileLoadingException ex) {
+        log.error(ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+    
+    @ExceptionHandler(MailSendingException.class)
+    public ResponseEntity<ErrorResponse> handlerMailSendingException(MailSendingException ex) {
+        log.error(ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

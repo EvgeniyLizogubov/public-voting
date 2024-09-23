@@ -94,4 +94,18 @@
             );
         </sql>
     </changeSet>
+
+    <changeSet id="init-certificate" author="Lizogubov Eugeny">
+        <preConditions>
+            <tableExists tableName="users"/>
+        </preConditions>
+        <sql>
+            CREATE TABLE certificate
+            (
+                id      SERIAL PRIMARY KEY,
+                owner_id INTEGER NOT NULL REFERENCES users (id),
+                year    INTEGER NOT NULL
+            );
+        </sql>
+    </changeSet>
 </databaseChangeLog>
